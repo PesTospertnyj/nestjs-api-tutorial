@@ -4,6 +4,8 @@ import { PrismaService } from '../src/prisma/prisma.service'
 import { AppModule } from '../src/app.module'
 import * as pactum from 'pactum'
 import { AuthDto } from 'src/auth/dto'
+import { BookmarkCreateDto, BookmarkUpdateDto } from 'src/bookmark/dto'
+import { UpdateUserDto as UserUpdateDto } from 'src/user/dto'
 
 describe('App e2e', () => {
     let app: INestApplication
@@ -37,7 +39,7 @@ describe('App e2e', () => {
     describe('Auth', () => {
         const dto: AuthDto = {
             email: 'example@gmail.com',
-            password: 'someultrapass',
+            password: 'Someultrapass1!_sdfasd',
         }
         describe('Signup', () => {
             it('should throw if email is empty', () => {
@@ -92,6 +94,16 @@ describe('App e2e', () => {
                     })
                     .expectStatus(HttpStatus.BAD_REQUEST)
             })
+            it('should throw if password is not strong enough', () => {
+                return pactum
+                    .spec()
+                    .post('/auth/signin')
+                    .withBody({
+                        email: 'example@gmail.com',
+                        password: 'weakpassword',
+                    })
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+            })
             it('should throw if body is empty', () => {
                 return pactum
                     .spec()
@@ -114,17 +126,181 @@ describe('App e2e', () => {
                 return pactum
                     .spec()
                     .get('/users/me')
-                    .withHeaders("Authorization", 'Bearer $S{user_access_token}')
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+                    .expectStatus(HttpStatus.OK)
+                    .stores('uder_id', 'id')
+            })
+        })
+        describe('update', () => {
+            const dto: UserUpdateDto = {
+               firstName: 'John',
+               lastName: 'Doe'
+            }
+            it('should throw if id is empty', () => {
+                return pactum
+                    .spec()
+                    .patch('/users/{id}')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withBody({
+                        title: 'some title',
+                    })
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should throw if body is empty', () => {
+                return pactum
+                    .spec()
+                    .patch('/users/{id}')
+                    .withPathParams('id', '$S{uder_id}')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should update', () => {
+                return pactum
+                    .spec()
+                    .patch('/users/{id}')
+                    .withBody(dto)
+                    .withPathParams('id', '$S{uder_id}')
+                    .expectStatus(HttpStatus.OK)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+        })
+    })
+    describe('Bookmarks', () => {
+        describe('create', () => {
+            const dto: BookmarkCreateDto = {
+                userId: 1,
+                title: 'another title',
+                description: 'another description',
+                link: 'https://someotherurl.com',
+            }
+            it('should throw if id is empty', () => {
+                return pactum
+                    .spec()
+                    .post('/bookmarks')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withBody({
+                        title: 'some title',
+                    })
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should throw if body is empty', () => {
+                return pactum
+                    .spec()
+                    .post('/bookmarks')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should create', () => {
+                return pactum
+                    .spec()
+                    .post('/bookmarks')
+                    .withBody(dto)
+                    .expectStatus(HttpStatus.CREATED)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+                    .stores('bookmark_id', 'id')
+            })
+        })
+        describe('get', () => {
+            it('should get all bookmarks', () => {
+                return pactum
+                    .spec()
+                    .get('/bookmarks')
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
                     .expectStatus(HttpStatus.OK)
             })
         })
-        describe('update', () => {})
-    })
-    describe('Bookmarks', () => {
-        describe('create', () => {})
-        describe('get', () => {})
-        describe('get_by_id', () => {})
-        describe('update', () => {})
-        describe('delete', () => {})
+        describe('get_by_id', () => {
+            it('should get bookmark by id', () => {
+                return pactum
+                    .spec()
+                    .get('/bookmarks/{id}')
+                    .withPathParams('id', '$S{bookmark_id}')
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+                    .expectStatus(HttpStatus.OK)
+            })
+        })
+        describe('update', () => {
+            const dto: BookmarkUpdateDto = {
+                title: 'another modified title',
+                description: 'another modified description',
+                link: 'https://some.modified.url.com',
+            }
+            it('should throw if id is empty', () => {
+                return pactum
+                    .spec()
+                    .patch('/bookmarks/{id}')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withBody({
+                        title: 'some title',
+                    })
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should throw if body is empty', () => {
+                return pactum
+                    .spec()
+                    .patch('/bookmarks/{id}')
+                    .withPathParams('id', '$S{bookmark_id}')
+                    .expectStatus(HttpStatus.BAD_REQUEST)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+            it('should update', () => {
+                return pactum
+                    .spec()
+                    .patch('/bookmarks/{id}')
+                    .withBody(dto)
+                    .withPathParams('id', '$S{bookmark_id}')
+                    .expectStatus(HttpStatus.OK)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+        })
+        describe('delete', () => {
+            it('should delete bookmark by id', () => {
+                return pactum
+                    .spec()
+                    .delete('/bookmarks/{id}')
+                    .withPathParams('id', '$S{bookmark_id}')
+                    .expectStatus(HttpStatus.OK)
+                    .withHeaders(
+                        'Authorization',
+                        'Bearer $S{user_access_token}'
+                    )
+            })
+        })
     })
 })
