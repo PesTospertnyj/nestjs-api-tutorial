@@ -1,5 +1,5 @@
 import { ForbiddenException, HttpException, Injectable, UnprocessableEntityException } from "@nestjs/common";
-import { PrismaService } from "src/prisma/prisma.service";
+import { PrismaService } from "../prisma/prisma.service";
 import * as argon from 'argon2';
 import { AuthDto } from "./dto";
 import { Prisma } from "@prisma/client";
@@ -45,9 +45,7 @@ export class AuthService {
                 },
             })
 
-            delete user.hash;
-
-            return user;
+            return this.signToken(user.id, user.email)
         } catch (error) {
             if (error instanceof Prisma.PrismaClientKnownRequestError) {
                 if (error.code === this.ErrCodeUserExists) {
