@@ -6,6 +6,7 @@ import * as pactum from 'pactum'
 import { AuthDto } from 'src/auth/dto'
 import { BookmarkCreateDto, BookmarkUpdateDto } from 'src/bookmark/dto'
 import { UpdateUserDto as UserUpdateDto } from 'src/user/dto'
+import { CreateUserDto } from 'src/user/dto/create-user.dto'
 
 describe('App e2e', () => {
     let app: INestApplication
@@ -37,11 +38,13 @@ describe('App e2e', () => {
     })
 
     describe('Auth', () => {
-        const dto: AuthDto = {
-            email: 'example@gmail.com',
-            password: 'Someultrapass1!_sdfasd',
-        }
         describe('Signup', () => {
+            const dto: CreateUserDto = {
+                email: 'example@gmail.com',
+                password: 'Someultrapass1!_sdfasd',
+                firstName: 'John',
+                lastName: 'Doe',
+            }
             it('should throw if email is empty', () => {
                 return pactum
                     .spec()
@@ -76,6 +79,10 @@ describe('App e2e', () => {
         })
 
         describe('Signin', () => {
+            const dto: AuthDto = {
+                email: 'example@gmail.com',
+                password: 'Someultrapass1!_sdfasd',
+            }
             it('should throw if email is empty', () => {
                 return pactum
                     .spec()
@@ -131,13 +138,13 @@ describe('App e2e', () => {
                         'Bearer $S{user_access_token}'
                     )
                     .expectStatus(HttpStatus.OK)
-                    .stores('uder_id', 'id')
+                    .stores('user_id', 'id')
             })
         })
         describe('update', () => {
             const dto: UserUpdateDto = {
-               firstName: 'John',
-               lastName: 'Doe'
+                firstName: 'John',
+                lastName: 'Doe',
             }
             it('should throw if id is empty', () => {
                 return pactum
@@ -156,7 +163,7 @@ describe('App e2e', () => {
                 return pactum
                     .spec()
                     .patch('/users/{id}')
-                    .withPathParams('id', '$S{uder_id}')
+                    .withPathParams('id', '$S{user_id}')
                     .expectStatus(HttpStatus.BAD_REQUEST)
                     .withHeaders(
                         'Authorization',
@@ -168,7 +175,7 @@ describe('App e2e', () => {
                     .spec()
                     .patch('/users/{id}')
                     .withBody(dto)
-                    .withPathParams('id', '$S{uder_id}')
+                    .withPathParams('id', '$S{user_id}')
                     .expectStatus(HttpStatus.OK)
                     .withHeaders(
                         'Authorization',

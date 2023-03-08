@@ -1,8 +1,4 @@
-import {
-    ForbiddenException,
-    Injectable,
-    UnprocessableEntityException,
-} from '@nestjs/common'
+import { Injectable, UnprocessableEntityException } from '@nestjs/common'
 import { Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { BookmarkCreateDto, BookmarkUpdateDto } from './dto'
@@ -10,6 +6,7 @@ import { BookmarkCreateDto, BookmarkUpdateDto } from './dto'
 @Injectable()
 export class BookmarkService {
     constructor(private prisma: PrismaService) {}
+
     ErrUserIDNotExists = 'P2003'
     ErrBookmarkDoesNotExists = 'P2025'
 
@@ -40,8 +37,8 @@ export class BookmarkService {
     }
 
     async update(id: number, dto: BookmarkUpdateDto) {
-        console.log(typeof id);
-        
+        console.log(typeof id)
+
         try {
             return await this.prisma.bookmark.update({
                 data: dto,

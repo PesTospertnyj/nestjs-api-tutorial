@@ -1,7 +1,7 @@
-import { Logger, ValidationPipe } from '@nestjs/common'
+import { ValidationPipe } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
-import { LoggerMiddleware } from './logger.middleware'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
     const app = await NestFactory.create(AppModule, {
@@ -13,6 +13,15 @@ async function bootstrap() {
         })
     )
 
+    const config = new DocumentBuilder()
+        .setTitle('Nestjs Bookmark API')
+        .setDescription('Nestjs Bookmark API description')
+        .setVersion('1.0')
+        .build()
+    const document = SwaggerModule.createDocument(app, config)
+    SwaggerModule.setup('api', app, document)
+
     await app.listen(3000)
 }
+
 bootstrap()
