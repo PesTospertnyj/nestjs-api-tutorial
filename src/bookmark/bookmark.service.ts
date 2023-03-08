@@ -10,12 +10,16 @@ export class BookmarkService {
     ErrUserIDNotExists = 'P2003'
     ErrBookmarkDoesNotExists = 'P2025'
 
-    async get() {
-        return this.prisma.bookmark.findMany()
+    async get(userId: number) {
+        return this.prisma.bookmark.findMany({
+            where: {
+                userId: userId,
+            },
+        })
     }
 
     async getById(id: number) {
-        return await this.prisma.bookmark.findUnique({ where: { id: id } })
+        return this.prisma.bookmark.findUnique({ where: { id: id } })
     }
 
     async create(dto: BookmarkCreateDto) {

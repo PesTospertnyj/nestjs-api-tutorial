@@ -101,16 +101,6 @@ describe('App e2e', () => {
                     })
                     .expectStatus(HttpStatus.BAD_REQUEST)
             })
-            it('should throw if password is not strong enough', () => {
-                return pactum
-                    .spec()
-                    .post('/auth/signin')
-                    .withBody({
-                        email: 'example@gmail.com',
-                        password: 'weakpassword',
-                    })
-                    .expectStatus(HttpStatus.BAD_REQUEST)
-            })
             it('should throw if body is empty', () => {
                 return pactum
                     .spec()

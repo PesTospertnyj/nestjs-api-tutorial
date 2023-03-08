@@ -23,6 +23,8 @@ import {
     ApiUnprocessableEntityResponse,
 } from '@nestjs/swagger'
 import { BookmarkDto } from './dto/bookmark.dto'
+import { GetUser } from '../auth/decorator'
+import { User } from '@prisma/client'
 
 @ApiTags('bookmarks')
 @UseGuards(JwtGuard)
@@ -37,8 +39,8 @@ export class BookmarkController {
     })
     @ApiInternalServerErrorResponse({ description: 'InternalServerError.' })
     @Get()
-    async get() {
-        return await this.bookmarkService.get()
+    async get(@GetUser() user: User) {
+        return this.bookmarkService.get(user.id)
     }
 
     @ApiOkResponse({

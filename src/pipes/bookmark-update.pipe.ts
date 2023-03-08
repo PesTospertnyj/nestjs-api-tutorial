@@ -4,7 +4,6 @@ import {
     ArgumentMetadata,
     BadRequestException,
 } from '@nestjs/common'
-import { BookmarkUpdateDto } from '../bookmark/dto/bookmark-update.dto'
 
 @Injectable()
 export class CheckNullBodyPipe implements PipeTransform {

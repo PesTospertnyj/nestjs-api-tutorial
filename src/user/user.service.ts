@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable } from '@nestjs/common'
+import {
+    ForbiddenException,
+    Injectable,
+    UnprocessableEntityException,
+} from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { UpdateUserDto } from './dto'
 import * as argon from 'argon2'
@@ -9,10 +13,11 @@ import { CreateUserDto } from './dto/create-user.dto'
 export class UserService {
     constructor(private prisma: PrismaService) {}
 
+    ErrUserIDNotExists = 'P2003'
     ErrCodeUserExists = 'P2002'
 
     async getById(id: number) {
-        return await this.prisma.user.findFirst({ where: { id: id } })
+        return this.prisma.user.findFirst({ where: { id: id } })
     }
 
     async create(dto: CreateUserDto) {
@@ -44,9 +49,25 @@ export class UserService {
         }
 
         data = { ...data, ...dto }
-        return await this.prisma.user.update({
-            where: { id: id },
-            data: data,
-        })
+
+        try {
+            const user = await this.prisma.user.update({
+                where: { id: id },
+                data: data,
+            })
+            delete user.hash
+
+            return user
+        } catch (error) {
+            if (error instanceof Prisma.PrismaClientKnownRequestError) {
+                if (error.code === this.ErrUserIDNotExists) {
+                    throw new UnprocessableEntityException(
+                        'User wit given id does not exist'
+                    )
+                }
+            }
+
+            throw error
+        }
     }
 }
