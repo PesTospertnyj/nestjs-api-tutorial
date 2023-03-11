@@ -5,7 +5,6 @@ import { BookmarkModule } from './bookmark/bookmark.module'
 import { PrismaModule } from './prisma/prisma.module'
 import { ConfigModule } from '@nestjs/config'
 import { LoggerMiddleware } from './logger.middleware'
-import { AuthController } from './auth/auth.controller'
 import { CacheModule } from './cache/cache.module'
 
 @Module({

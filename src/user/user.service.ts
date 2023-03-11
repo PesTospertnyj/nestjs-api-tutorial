@@ -6,7 +6,7 @@ import {
 import { PrismaService } from '../prisma/prisma.service'
 import { UpdateUserDto } from './dto'
 import * as argon from 'argon2'
-import { Prisma } from '@prisma/client'
+import { Prisma, User } from '@prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
 
 @Injectable()
@@ -20,7 +20,7 @@ export class UserService {
         return this.prisma.user.findFirst({ where: { id: id } })
     }
 
-    async create(dto: CreateUserDto) {
+    async create(dto: CreateUserDto): Promise<User> {
         const hash = await argon.hash(dto.password)
         try {
             return await this.prisma.user.create({
@@ -40,7 +40,7 @@ export class UserService {
         }
     }
 
-    async update(id: number, dto: UpdateUserDto) {
+    async update(id: number, dto: UpdateUserDto): Promise<User> {
         let data: object
         if (dto.password && dto.password.length > 1) {
             const hash = await argon.hash(dto.password)

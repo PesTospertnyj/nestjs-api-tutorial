@@ -1,5 +1,5 @@
 import { Injectable, UnprocessableEntityException } from '@nestjs/common'
-import { Prisma } from '@prisma/client'
+import { Bookmark, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { BookmarkCreateDto, BookmarkUpdateDto } from './dto'
 
@@ -10,7 +10,7 @@ export class BookmarkService {
     ErrUserIDNotExists = 'P2003'
     ErrBookmarkDoesNotExists = 'P2025'
 
-    async get(userId: number) {
+    async get(userId: number): Promise<Bookmark[]> {
         return this.prisma.bookmark.findMany({
             where: {
                 userId: userId,
@@ -18,11 +18,11 @@ export class BookmarkService {
         })
     }
 
-    async getById(id: number) {
+    async getById(id: number): Promise<Bookmark> {
         return this.prisma.bookmark.findUnique({ where: { id: id } })
     }
 
-    async create(dto: BookmarkCreateDto) {
+    async create(dto: BookmarkCreateDto): Promise<Bookmark> {
         try {
             return await this.prisma.bookmark.create({
                 data: dto,
@@ -40,7 +40,7 @@ export class BookmarkService {
         }
     }
 
-    async update(id: number, dto: BookmarkUpdateDto) {
+    async update(id: number, dto: BookmarkUpdateDto): Promise<Bookmark> {
         console.log(typeof id)
 
         try {
@@ -63,7 +63,7 @@ export class BookmarkService {
         }
     }
 
-    async delete(id: number) {
+    async delete(id: number): Promise<Bookmark> {
         try {
             await this.prisma.bookmark.delete({
                 where: {

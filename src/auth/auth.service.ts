@@ -18,7 +18,7 @@ export class AuthService {
 
     TokenExpiration = '15m'
 
-    async signIn(dto: AuthDto) {
+    async signIn(dto: AuthDto): Promise<TokenResponseDto> {
         const user = await this.prisma.user.findFirst({
             where: {
                 email: dto.email,
@@ -37,7 +37,7 @@ export class AuthService {
         return this.signToken(user.id, user.email)
     }
 
-    async signUp(dto: CreateUserDto) {
+    async signUp(dto: CreateUserDto): Promise<TokenResponseDto> {
         const user = await this.userService.create(dto)
 
         return this.signToken(user.id, user.email)
